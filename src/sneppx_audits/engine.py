@@ -214,6 +214,15 @@ def _eval_single(cid, e):
         if e.get("has_version_file") or e.get("has_changelog"):
             return "pass", None
         return "review", "no version file or changelog"
+    if cid == "KMS":
+        if e.get("kms_key_id") and e.get("key_rotation_enabled"):
+            return "pass", None
+        issues = []
+        if not e.get("kms_key_id"):
+            issues.append("no kms_key_id")
+        if not e.get("key_rotation_enabled"):
+            issues.append("key rotation not enabled")
+        return "fail", "; ".join(issues)
     return "review", "unknown control"
 
 
