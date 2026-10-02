@@ -19,6 +19,7 @@ DEFAULT_CONTROLS = [
     ("SEC", "no embedded secrets",    "high"),
     ("SBM", "SBOM auditable",         "low"),
     ("TST", "test suite present",     "low"),
+    ("DSX", "dataset documentation",  "medium"),
 ]
 
 _SECRET_PATTERNS = [
@@ -202,4 +203,8 @@ def _eval_single(cid, e):
         if e.get("has_tests"):
             return "pass", None
         return "review", "no tests/"
+    if cid == "DSX":
+        if e.get("has_readme") or e.get("has_license"):
+            return "pass", None
+        return "review", "no documentation found"
     return "review", "unknown control"
