@@ -20,6 +20,7 @@ DEFAULT_CONTROLS = [
     ("SBM", "SBOM auditable",         "low"),
     ("TST", "test suite present",     "low"),
     ("DSX", "dataset documentation",  "medium"),
+    ("VER", "model versioning",        "low"),
 ]
 
 _SECRET_PATTERNS = [
@@ -57,6 +58,8 @@ class AuditReport:
             e["has_sbom"] = _any_file_matches(self.target, _SBOM_NAMES)
             e["has_signature"] = any(p.suffix == ".sig" for p in self.target.iterdir())
             e["secret_patterns"] = _scan_secrets(self.target)
+            e["has_version_file"] = _any_file_matches(self.target, {"version", "changelog", "changes", "history"})
+            e["has_changelog"] = _any_file_matches(self.target, {"changelog", "changes", "history"})
         elif self.target.is_file():
             e["has_readme"] = False
             e["has_license"] = False
@@ -207,4 +210,8 @@ def _eval_single(cid, e):
         if e.get("has_readme") or e.get("has_license"):
             return "pass", None
         return "review", "no documentation found"
+    if cid == "VER":
+        if e.get("has_version_file") or e.get("has_changelog"):
+            return "pass", None
+        return "review", "no version file or changelog"
     return "review", "unknown control"
