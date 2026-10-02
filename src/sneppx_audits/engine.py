@@ -215,3 +215,26 @@ def _eval_single(cid, e):
             return "pass", None
         return "review", "no version file or changelog"
     return "review", "unknown control"
+
+
+def merge_evidence(evidence_list):
+    """Merge evidence from multiple audit targets into a single dict.
+
+    For boolean keys, uses OR (any target has it -> True).
+    For list keys (like secret_patterns), concatenates.
+    """
+    if not evidence_list:
+        return {}
+    merged = {}
+    bool_keys = {"has_readme", "has_license", "has_tests", "has_sbom",
+                 "has_signature", "has_version_file", "has_changelog"}
+    list_keys = {"secret_patterns"}
+    for ev in evidence_list:
+        for k, v in ev.items():
+            if k in bool_keys:
+                merged[k] = merged.get(k, False) or bool(v)
+            elif k in list_keys:
+                merged[k] = merged.get(k, []) + list(v)
+            elif k not in merged:
+                merged[k] = v
+    return merged
