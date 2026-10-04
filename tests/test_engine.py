@@ -15,6 +15,7 @@ def _good_project(tmp):
     (d / "model_card.md").write_text("# Model card", encoding="utf-8")
     (d / "model.bin.sig").write_text("{}", encoding="utf-8")
     (d / "sbom.json").write_text("{}", encoding="utf-8")
+    (d / "CHANGELOG.md").write_text("# Changelog", encoding="utf-8")
     t = d / "tests"
     t.mkdir()
     (t / "test_model.py").write_text("pass", encoding="utf-8")
@@ -65,6 +66,7 @@ def test_file_sha256(tmp_path):
     f.write_bytes(b"hello")
     digest = file_sha256(f)
     import hashlib
+
     assert digest == hashlib.sha256(b"hello").hexdigest()
 
 
